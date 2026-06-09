@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { LogoMark } from "@/components/logo";
 import { getTheme } from "@/lib/themes";
@@ -6,6 +7,9 @@ import {
   fontStack,
   contrastText,
   normalizeHex,
+  withAlpha,
+  resolveCustomTheme,
+  CUSTOM_THEME_ID,
 } from "@/lib/appearance";
 import { getPlatform } from "@/lib/social";
 import { embedSrc } from "@/lib/embed";
@@ -40,6 +44,10 @@ export type LinktreeViewProps = {
   hideBranding?: boolean;
   collectEmails?: boolean;
   emailHeading?: string | null;
+  // Custom theme colors (used when theme === "custom").
+  customBg?: string | null;
+  customBg2?: string | null;
+  customText?: string | null;
   links: LinkItem[];
   socials?: SocialItem[];
   // When true, link clicks route through the tracking redirect and a page-view
@@ -65,6 +73,9 @@ export function LinktreeView({
   hideBranding = false,
   collectEmails = false,
   emailHeading,
+  customBg,
+  customBg2,
+  customText,
   links,
   socials = [],
   trackClicks = false,
@@ -73,30 +84,65 @@ export function LinktreeView({
   const radius = buttonRadius(buttonStyle);
   const accent = normalizeHex(accentColor);
 
-  // Resolve the button look: a custom accent overrides the theme's button
-  // classes, otherwise we use the theme's.
-  const buttonClass = accent
-    ? `${radius} border transition hover:opacity-90`
-    : `${radius} ${t.button}`;
-  const buttonStyleObj = accent
-    ? { backgroundColor: accent, borderColor: accent, color: contrastText(accent) }
+  const isCustom = theme === CUSTOM_THEME_ID;
+  const custom = isCustom
+    ? resolveCustomTheme({ customBg, customBg2, customText })
+    : null;
+
+  // Muted text: a class for presets, an inline color for custom themes.
+  const mutedClass = custom ? "" : t.muted;
+  const mutedStyle: CSSProperties | undefined = custom
+    ? { color: custom.mutedColor }
     : undefined;
+
+  // Button look: custom accent > custom-theme derived > preset classes.
+  let buttonClass: string;
+  let buttonStyleObj: CSSProperties | undefined;
+  if (accent) {
+    buttonClass = `${radius} border transition hover:opacity-90`;
+    buttonStyleObj = {
+      backgroundColor: accent,
+      borderColor: accent,
+      color: contrastText(accent),
+    };
+  } else if (custom) {
+    buttonClass = `${radius} border transition hover:opacity-90`;
+    buttonStyleObj = {
+      backgroundColor: withAlpha(custom.textColor, 0.12),
+      borderColor: withAlpha(custom.textColor, 0.22),
+      color: custom.textColor,
+    };
+  } else {
+    buttonClass = `${radius} ${t.button}`;
+    buttonStyleObj = undefined;
+  }
 
   const hasBgImage = Boolean(backgroundImageUrl);
 
+  const containerClass = custom ? "" : `${t.background} ${t.text}`;
+  const containerStyle: CSSProperties = {
+    fontFamily: fontStack(fontFamily),
+    ...(custom ? { ...custom.backgroundStyle, color: custom.textColor } : {}),
+    ...(hasBgImage
+      ? {
+          backgroundImage: `url(${backgroundImageUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }
+      : {}),
+  };
+
+  const avatarRingStyle = custom
+    ? ({ ["--tw-ring-color"]: custom.ringColor } as CSSProperties)
+    : undefined;
+
   return (
     <div
-      className={`relative flex min-h-full w-full flex-col items-center ${t.background} ${t.text} px-6 py-16`}
-      style={{
-        fontFamily: fontStack(fontFamily),
-        ...(hasBgImage
-          ? {
-              backgroundImage: `url(${backgroundImageUrl})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }
-          : {}),
-      }}
+      className={`relative flex w-full flex-col items-center ${
+        // Fill the viewport on public pages; fill the frame in the editor preview.
+        trackClicks ? "min-h-screen" : "min-h-full"
+      } ${containerClass} px-6 py-16`}
+      style={containerStyle}
     >
       {hasBgImage && (
         <div className="absolute inset-0 bg-black/40" aria-hidden />
@@ -106,7 +152,10 @@ export function LinktreeView({
       <div className="relative z-10 flex w-full max-w-md flex-1 flex-col items-center">
         {/* Avatar */}
         <div
-          className={`flex h-24 w-24 items-center justify-center overflow-hidden rounded-full ring-4 ${t.ring} bg-black/20 text-2xl font-bold`}
+          className={`flex h-24 w-24 items-center justify-center overflow-hidden rounded-full ring-4 ${
+            custom ? "" : t.ring
+          } bg-black/20 text-2xl font-bold`}
+          style={avatarRingStyle}
         >
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -122,7 +171,12 @@ export function LinktreeView({
 
         <h1 className="mt-5 text-center text-2xl font-bold">{title}</h1>
         {bio && (
-          <p className={`mt-2 max-w-sm text-center text-sm ${t.muted}`}>{bio}</p>
+          <p
+            className={`mt-2 max-w-sm text-center text-sm ${mutedClass}`}
+            style={mutedStyle}
+          >
+            {bio}
+          </p>
         )}
 
         {/* Social icons */}
@@ -212,7 +266,12 @@ export function LinktreeView({
             );
           })}
           {links.length === 0 && (
-            <p className={`text-center text-sm ${t.muted}`}>No links yet.</p>
+            <p
+              className={`text-center text-sm ${mutedClass}`}
+              style={mutedStyle}
+            >
+              No links yet.
+            </p>
           )}
         </div>
 
@@ -225,13 +284,17 @@ export function LinktreeView({
               buttonClassName={buttonClass}
               buttonStyle={buttonStyleObj}
               inputClassName={`${radius} bg-black/20 border border-white/15 placeholder:opacity-60`}
-              mutedClassName={t.muted}
+              mutedClassName={mutedClass}
+              mutedStyle={mutedStyle}
             />
           </div>
         )}
 
         {!hideBranding && (
-          <footer className={`mt-auto pt-12 text-xs ${t.muted}`}>
+          <footer
+            className={`mt-auto pt-12 text-xs ${mutedClass}`}
+            style={mutedStyle}
+          >
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 opacity-70 transition hover:opacity-100"

@@ -67,7 +67,7 @@ export function PageSettings({ page }: { page: Page }) {
           <span className="mb-2 block text-sm font-medium text-slate-300">
             Theme
           </span>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-7">
             {themes.map((t) => (
               <label key={t.id} className="cursor-pointer">
                 <input
@@ -86,6 +86,66 @@ export function PageSettings({ page }: { page: Page }) {
                 </span>
               </label>
             ))}
+            {/* Custom theme */}
+            <label className="cursor-pointer">
+              <input
+                type="radio"
+                name="theme"
+                value="custom"
+                defaultChecked={page.theme === "custom"}
+                className="peer sr-only"
+              />
+              <div
+                className="h-14 rounded-lg bg-[conic-gradient(at_top_left,_#f87171,_#fbbf24,_#34d399,_#60a5fa,_#c084fc,_#f87171)] ring-2 ring-transparent transition peer-checked:ring-white peer-checked:ring-offset-2 peer-checked:ring-offset-slate-900"
+                title="Custom"
+              />
+              <span className="mt-1 block text-center text-[11px] text-slate-400">
+                Custom
+              </span>
+            </label>
+          </div>
+
+          {/* Custom theme colors (apply when the Custom theme is selected) */}
+          <div className="mt-3 rounded-lg border border-white/10 bg-slate-900/40 p-4">
+            <p className="text-xs text-slate-400">
+              Custom colors — used when the <strong>Custom</strong> theme is
+              selected.
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="color"
+                  name="customBg"
+                  defaultValue={page.customBg ?? "#0f172a"}
+                  className="h-8 w-12 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+                <span className="text-sm text-slate-300">Background</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="customBg2Enabled"
+                  defaultChecked={Boolean(page.customBg2)}
+                  className={checkboxClass}
+                />
+                <input
+                  type="color"
+                  name="customBg2"
+                  defaultValue={page.customBg2 ?? "#312e81"}
+                  className="h-8 w-12 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+                <span className="text-sm text-slate-300">Gradient</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="color"
+                  name="customText"
+                  defaultValue={page.customText ?? "#ffffff"}
+                  className="h-8 w-12 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+                <span className="text-sm text-slate-300">Text</span>
+              </label>
+            </div>
           </div>
         </div>
 
