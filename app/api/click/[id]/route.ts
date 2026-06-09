@@ -4,22 +4,36 @@ import { prisma } from "@/lib/prisma";
 // Records a click then redirects to the link's destination. Used by public
 // pages so clicks are counted without exposing the dashboard.
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   const link = await prisma.link.findUnique({ where: { id } });
 
+  const home = new URL("/", req.url);
   if (!link || !link.active) {
-    return NextResponse.redirect(new URL("/", _req.url));
+    return NextResponse.redirect(home);
   }
 
-  // Best-effort increment; never block the redirect on a write failure.
+  // Respect a scheduled visibility window.
+  const now = new Date();
+  if ((link.startsAt && link.startsAt > now) || (link.endsAt && link.endsAt < now)) {
+    return NextResponse.redirect(home);
+  }
+
+  const referrer = req.headers.get("referer");
+
+  // Best-effort analytics; never block the redirect on a write failure.
   try {
-    await prisma.link.update({
-      where: { id: link.id },
-      data: { clicks: { increment: 1 } },
-    });
+    await prisma.$transaction([
+      prisma.link.update({
+        where: { id: link.id },
+        data: { clicks: { increment: 1 } },
+      }),
+      prisma.clickEvent.create({
+        data: { linkId: link.id, pageId: link.pageId, referrer },
+      }),
+    ]);
   } catch {
     // ignore
   }

@@ -7,9 +7,23 @@ import { LinktreeView } from "@/components/linktree-view";
 export const revalidate = 60;
 
 async function getPage(slug: string) {
+  const now = new Date();
   return prisma.page.findUnique({
     where: { slug: slug.toLowerCase() },
-    include: { links: { where: { active: true }, orderBy: { position: "asc" } } },
+    include: {
+      socialLinks: { orderBy: { position: "asc" } },
+      links: {
+        where: {
+          active: true,
+          // Respect the scheduled visibility window.
+          AND: [
+            { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
+            { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
+          ],
+        },
+        orderBy: { position: "asc" },
+      },
+    },
   });
 }
 
@@ -44,11 +58,20 @@ export default async function PublicPage({
   return (
     <div className="min-h-screen">
       <LinktreeView
+        pageId={page.id}
         title={page.title}
         bio={page.bio}
         avatarUrl={page.avatarUrl}
         theme={page.theme}
+        accentColor={page.accentColor}
+        backgroundImageUrl={page.backgroundImageUrl}
+        buttonStyle={page.buttonStyle}
+        fontFamily={page.fontFamily}
+        hideBranding={page.hideBranding}
+        collectEmails={page.collectEmails}
+        emailHeading={page.emailHeading}
         links={page.links}
+        socials={page.socialLinks}
         trackClicks
       />
     </div>
