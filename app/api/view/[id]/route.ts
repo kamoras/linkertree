@@ -30,16 +30,16 @@ export async function POST(
       select: { id: true },
     });
     if (page) {
-      // Upsert on (pageId, visitId) so a visitor is only counted once.
-      // A null visitId (cookies blocked) just inserts a fresh row each time.
-      if (visitId) {
-        await prisma.pageView.upsert({
-          where: { pageId_visitId: { pageId: id, visitId } },
-          create: { pageId: id, visitId, referrer },
-          update: {},
-        });
-      } else {
-        await prisma.pageView.create({ data: { pageId: id, referrer } });
+      // Dedupe per visitor: only record a view if this visit hasn't already
+      // been counted for this page. (No DB unique constraint — see schema.)
+      const already = visitId
+        ? await prisma.pageView.findFirst({
+            where: { pageId: id, visitId },
+            select: { id: true },
+          })
+        : null;
+      if (!already) {
+        await prisma.pageView.create({ data: { pageId: id, visitId, referrer } });
       }
     }
   } catch {

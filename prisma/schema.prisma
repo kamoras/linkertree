@@ -111,9 +111,13 @@ model PageView {
   pageId String
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
-  @@unique([pageId, visitId])
+  // No DB unique constraint on (pageId, visitId): adding one to an already
+  // populated table makes `prisma db push` demand --accept-data-loss, which
+  // would mask genuinely destructive changes on every future deploy. Views are
+  // deduped per visitor in the API route instead (best-effort is fine here).
   @@index([pageId])
   @@index([pageId, createdAt])
+  @@index([pageId, visitId])
 }
 
 // One row per link click (in addition to the denormalized Link.clicks counter).
