@@ -99,24 +99,30 @@ model SocialLink {
 
 // --- Analytics (Linktree Pro: detailed insights) ---
 
-// One row per public page visit.
+// One row per unique visitor per page. `visitId` is a cookie-backed id so a
+// refresh or return visit doesn't inflate the count, and so clicks can be
+// attributed to a visit for an honest click-through rate.
 model PageView {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   referrer  String?
+  visitId   String?
 
   pageId String
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
+  @@unique([pageId, visitId])
   @@index([pageId])
   @@index([pageId, createdAt])
 }
 
 // One row per link click (in addition to the denormalized Link.clicks counter).
+// `visitId` links the click back to the visit that made it.
 model ClickEvent {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   referrer  String?
+  visitId   String?
   pageId    String // denormalized for page-level aggregation
 
   linkId String
@@ -124,6 +130,7 @@ model ClickEvent {
 
   @@index([linkId])
   @@index([pageId, createdAt])
+  @@index([pageId, visitId])
 }
 
 // An email captured from a public page's subscribe form.

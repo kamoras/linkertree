@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 // Records a click then redirects to the link's destination. Used by public
@@ -22,6 +23,7 @@ export async function GET(
   }
 
   const referrer = req.headers.get("referer");
+  const visitId = (await cookies()).get("lt_vid")?.value ?? null;
 
   // Best-effort analytics; never block the redirect on a write failure.
   try {
@@ -31,7 +33,7 @@ export async function GET(
         data: { clicks: { increment: 1 } },
       }),
       prisma.clickEvent.create({
-        data: { linkId: link.id, pageId: link.pageId, referrer },
+        data: { linkId: link.id, pageId: link.pageId, referrer, visitId },
       }),
     ]);
   } catch {

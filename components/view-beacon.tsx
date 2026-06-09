@@ -2,10 +2,25 @@
 
 import { useEffect } from "react";
 
+// Ensure a stable per-visitor id in a cookie so the server can (a) count each
+// visitor once and (b) attribute clicks to a visit for an honest CTR.
+function ensureVisitId(): void {
+  if (document.cookie.includes("lt_vid=")) return;
+  const id =
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  // ~1 year, lax so it's sent on the click redirect navigation too.
+  document.cookie = `lt_vid=${id}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+}
+
 // Fire-and-forget page-view tracker. Runs once per browser session per page so
-// refreshes and React strict-mode double-renders don't inflate the count.
+// refreshes and React strict-mode double-renders don't spam the endpoint; the
+// server dedupes per visitor regardless.
 export function ViewBeacon({ pageId }: { pageId: string }) {
   useEffect(() => {
+    ensureVisitId();
+
     const key = `lt-viewed:${pageId}`;
     try {
       if (sessionStorage.getItem(key)) return;

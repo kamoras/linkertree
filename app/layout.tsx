@@ -4,12 +4,12 @@ import { Providers } from "./providers";
 
 const siteUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 const description =
-  "Everything you are, in one simple link in bio — for free. The open-source, self-hostable link-in-bio with analytics, custom themes, scheduling, embeds and email capture. Every Pro feature, zero dollars.";
+  "Bring together your links, content and socials on one beautiful page. Built-in analytics, custom themes, scheduling, embeds and email capture — all included, free to use.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Linkertree — one link in bio, every Pro feature free",
+    default: "Linkertree — everything you are, in one simple link",
     template: "%s · Linkertree",
   },
   description,
@@ -17,8 +17,7 @@ export const metadata: Metadata = {
   keywords: [
     "link in bio",
     "linktree alternative",
-    "open source",
-    "self-hosted",
+    "free link in bio",
     "bio link",
     "links page",
   ],
@@ -28,12 +27,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Linkertree",
     url: "/",
-    title: "Linkertree — one link in bio, every Pro feature free",
+    title: "Linkertree — everything you are, in one simple link",
     description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Linkertree — one link in bio, every Pro feature free",
+    title: "Linkertree — everything you are, in one simple link",
     description,
   },
   robots: { index: true, follow: true },
