@@ -8,7 +8,18 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const referrer = req.headers.get("referer");
+
+  // The client sends the real external referrer (document.referrer); the
+  // request's own Referer header would just be the linktree page itself.
+  let referrer: string | null = null;
+  try {
+    const body = await req.json();
+    if (typeof body?.referrer === "string" && body.referrer.trim()) {
+      referrer = body.referrer.trim().slice(0, 300);
+    }
+  } catch {
+    // no/invalid body — count as a direct view
+  }
 
   try {
     const page = await prisma.page.findUnique({
