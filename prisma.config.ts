@@ -11,6 +11,8 @@ import { defineConfig } from "prisma/config";
 export default defineConfig({
   schema: "prisma/schema.prisma",
   datasource: {
-    url: process.env.DATABASE_URL,
+    // CLI commands (db push / migrate) should use a direct (non-pooled)
+    // connection when one is available, falling back to DATABASE_URL otherwise.
+    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL,
   },
 });
