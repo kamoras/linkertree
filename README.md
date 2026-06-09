@@ -9,13 +9,20 @@ they want, and deploy the whole thing to Vercel's free tier in minutes.
 - 🎨 **Six built-in themes**, live editor preview, drag-free reordering
 - 📊 **Click tracking** per link
 - 🚀 **Deploy free on Vercel** with a free Postgres database
-- 🧩 Next.js 14 (App Router) · TypeScript · Tailwind · Prisma
+- 🧩 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Prisma 7
 
 ---
 
 ## Quick start (local)
 
-Requires Node 18+.
+Requires Node 20+ and a **PostgreSQL** database. The quickest local DB is Docker:
+
+```bash
+docker run --name linkertree-db -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=linkertree -p 5432:5432 -d postgres:16
+```
+
+…or use a free dev database from [Neon](https://neon.tech) / [Supabase](https://supabase.com).
 
 ```bash
 # 1. Install dependencies
@@ -23,9 +30,10 @@ npm install
 
 # 2. Create your env file
 cp .env.example .env
-# then set NEXTAUTH_SECRET — generate one with:  openssl rand -base64 32
+# then set DATABASE_URL to your Postgres connection string, and
+# set NEXTAUTH_SECRET — generate one with:  openssl rand -base64 32
 
-# 3. Create the database (SQLite by default — zero setup)
+# 3. Create the database tables
 npx prisma db push
 
 # 4. (optional) seed a demo account → demo@linkertree.dev / password123
@@ -59,26 +67,17 @@ Data model (`prisma/schema.prisma`): a **User** has many **Page**s, and each
 
 ## Deploy to Vercel (free)
 
-SQLite doesn't persist on Vercel's serverless filesystem, so production uses
-Postgres. The free tiers of [Neon](https://neon.tech),
+The app uses **PostgreSQL** (Prisma 7 connects through the node-postgres driver
+adapter). The free tiers of [Neon](https://neon.tech),
 [Supabase](https://supabase.com), or
 [Vercel Postgres](https://vercel.com/storage/postgres) all work.
 
-1. **Switch the Prisma provider** in `prisma/schema.prisma`:
+1. **Create a free Postgres database** and copy its connection string.
 
-   ```prisma
-   datasource db {
-     provider = "postgresql"   // was "sqlite"
-     url      = env("DATABASE_URL")
-   }
-   ```
-
-2. **Create a free Postgres database** and copy its connection string.
-
-3. **Push to GitHub**, then import the repo at
+2. **Push to GitHub**, then import the repo at
    [vercel.com/new](https://vercel.com/new).
 
-4. **Set Environment Variables** in the Vercel project:
+3. **Set Environment Variables** in the Vercel project:
 
    | Name | Value |
    | --- | --- |
@@ -86,7 +85,7 @@ Postgres. The free tiers of [Neon](https://neon.tech),
    | `NEXTAUTH_SECRET` | `openssl rand -base64 32` |
    | `NEXTAUTH_URL` | `https://your-app.vercel.app` |
 
-5. **Deploy.** The `build` script runs `prisma db push` automatically, so your
+4. **Deploy.** The `build` script runs `prisma db push` automatically, so your
    tables are created/synced against Postgres on every deploy — no manual
    migration step needed.
 

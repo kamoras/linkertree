@@ -5,13 +5,22 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    # Group minor/patch updates by dependency type so the auto-merge workflow
+    # can land them in a single PR once CI passes. Major updates are
+    # deliberately left ungrouped — they come as individual PRs and are NOT
+    # auto-merged, so each breaking bump gets a focused manual review.
     groups:
       production-dependencies:
         dependency-type: "production"
+        update-types: ["minor", "patch"]
       development-dependencies:
         dependency-type: "development"
+        update-types: ["minor", "patch"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      github-actions:
+        update-types: ["minor", "patch"]

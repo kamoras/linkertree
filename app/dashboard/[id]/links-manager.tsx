@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 import type { Link as LinkModel } from "@prisma/client";
 import {
   addLink,
@@ -19,7 +19,7 @@ export function LinksManager({
   links: LinkModel[];
 }) {
   const action = addLink.bind(null, pageId);
-  const [state, formAction] = useFormState(action, undefined);
+  const [state, formAction] = useActionState(action, undefined);
   const formRef = useRef<HTMLFormElement>(null);
 
   // Clear the add-form after a successful submit (state resets to {error: undefined}).

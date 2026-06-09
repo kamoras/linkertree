@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTheme } from "@/lib/themes";
 
 export type LinktreeViewProps = {
@@ -73,12 +74,12 @@ export function LinktreeView({
         </div>
 
         <footer className={`mt-auto pt-12 text-xs ${t.muted}`}>
-          <a
+          <Link
             href="/"
             className="opacity-70 transition hover:opacity-100"
           >
             Made with 🌿 Linkertree
-          </a>
+          </Link>
         </footer>
       </div>
     </div>

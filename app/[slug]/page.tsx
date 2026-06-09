@@ -16,9 +16,10 @@ async function getPage(slug: string) {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const page = await getPage(params.slug);
+  const { slug } = await params;
+  const page = await getPage(slug);
   if (!page || !page.published) return { title: "Not found" };
   return {
     title: page.title,
@@ -34,9 +35,10 @@ export async function generateMetadata({
 export default async function PublicPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const page = await getPage(params.slug);
+  const { slug } = await params;
+  const page = await getPage(slug);
   if (!page || !page.published) notFound();
 
   return (

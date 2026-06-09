@@ -54,7 +54,7 @@ export async function updatePage(
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const data = parsed.data;
@@ -104,7 +104,7 @@ export async function addLink(
     url: formData.get("url"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const max = await prisma.link.aggregate({

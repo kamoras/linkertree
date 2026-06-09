@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import type { Page } from "@prisma/client";
 import { themes } from "@/lib/themes";
 import { updatePage } from "@/app/actions/pages";
@@ -8,7 +9,7 @@ import { DeletePageButton } from "./delete-page-button";
 
 export function PageSettings({ page }: { page: Page }) {
   const action = updatePage.bind(null, page.id);
-  const [state, formAction] = useFormState(action, undefined);
+  const [state, formAction] = useActionState(action, undefined);
 
   return (
     <section className="rounded-2xl border border-white/10 bg-white/5 p-6">

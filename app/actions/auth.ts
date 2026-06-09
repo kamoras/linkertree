@@ -41,7 +41,7 @@ export async function registerUser(formData: FormData): Promise<ActionResult> {
   });
 
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.errors[0]?.message ?? "Invalid input" };
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
   }
 
   const { name, email, password } = parsed.data;

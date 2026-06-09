@@ -1,7 +1,11 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+// Prisma 7 connects via a driver adapter (see lib/prisma.ts). The seed runs
+// outside Next, so the db:seed script loads .env via `tsx --env-file`.
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 // Seeds a demo account so you can try the app immediately.
 // Login:  demo@linkertree.dev  /  password123

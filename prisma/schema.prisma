@@ -1,8 +1,8 @@
 // Prisma schema for Linkertree.
 //
-// Local dev uses SQLite (zero config). For production on Vercel, switch the
-// datasource provider to "postgresql" and point DATABASE_URL at a free Postgres
-// (Neon, Supabase, or Vercel Postgres). See README for the one-line change.
+// Uses PostgreSQL in every environment. Prisma 7 supplies the connection URL
+// via prisma.config.ts (for CLI commands) and a driver adapter at runtime
+// (see lib/prisma.ts), so there is no `url` field on the datasource here.
 
 generator client {
   provider = "prisma-client-js"
@@ -10,7 +10,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {

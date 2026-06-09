@@ -5,9 +5,10 @@ import { prisma } from "@/lib/prisma";
 // pages so clicks are counted without exposing the dashboard.
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const link = await prisma.link.findUnique({ where: { id: params.id } });
+  const { id } = await params;
+  const link = await prisma.link.findUnique({ where: { id } });
 
   if (!link || !link.active) {
     return NextResponse.redirect(new URL("/", _req.url));

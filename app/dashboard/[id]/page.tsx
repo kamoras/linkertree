@@ -11,13 +11,14 @@ export const metadata = { title: "Edit page" };
 export default async function EditPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
   const page = await prisma.page.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { links: { orderBy: { position: "asc" } } },
   });
 
