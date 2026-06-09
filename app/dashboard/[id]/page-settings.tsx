@@ -104,7 +104,7 @@ export function PageSettings({ page }: { page: Page }) {
         {/* Appearance & branding */}
         <details className="rounded-lg border border-white/10 bg-slate-900/40 p-4">
           <summary className="cursor-pointer select-none text-sm font-medium text-slate-200">
-            🎨 Appearance & branding
+            Appearance &amp; branding
           </summary>
           <div className="mt-4 space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -183,7 +183,7 @@ export function PageSettings({ page }: { page: Page }) {
         {/* Email capture */}
         <details className="rounded-lg border border-white/10 bg-slate-900/40 p-4">
           <summary className="cursor-pointer select-none text-sm font-medium text-slate-200">
-            ✉️ Collect emails
+            Collect emails
           </summary>
           <div className="mt-4 space-y-4">
             <label className="flex items-center gap-3">

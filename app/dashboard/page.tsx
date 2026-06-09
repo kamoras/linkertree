@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getTheme } from "@/lib/themes";
 import { createPage } from "@/app/actions/pages";
+import { Logo } from "@/components/logo";
 import { SignOutButton } from "./sign-out-button";
 
 export const metadata = { title: "Dashboard" };
@@ -21,8 +22,8 @@ export default async function DashboardPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <header className="flex items-center justify-between">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          🌿 Linkertree
+        <Link href="/" aria-label="Linkertree home">
+          <Logo className="text-lg text-white" />
         </Link>
         <div className="flex items-center gap-3">
           <span className="hidden text-sm text-slate-400 sm:inline">

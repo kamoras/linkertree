@@ -1,4 +1,4 @@
-# 🌿 Linkertree
+# Linkertree
 
 An **open-source, MIT-licensed, free** link-in-bio platform — a self-hostable
 alternative to Linktree. Sign up users, give each of them as many link pages as
@@ -6,16 +6,16 @@ they want, and deploy the whole thing to Vercel's free tier in minutes.
 
 Free, self-hosted versions of the features Linktree charges for:
 
-- 🔐 **Email + password accounts** (NextAuth, no third-party OAuth required)
-- 🌳 **Many linktrees per user** — one account, unlimited pages
-- 📊 **Analytics** — page views, clicks, CTR, top links & traffic sources (last 30 days)
-- 🎨 **Custom appearance** — 6 themes plus custom accent color, background image, button shape & font
-- 🧱 **Link power-ups** — thumbnails, scheduling (show/hide by date), featured links, drag-to-reorder
-- 🔗 **Social icon row** + **media embeds** (YouTube / Spotify)
-- ✉️ **Email lead capture** with CSV export
-- 🏷️ **Remove branding** toggle · 📱 **QR code** for every page
-- 🚀 **Deploy free on Vercel** with a free Postgres database
-- 🧩 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Prisma 7
+- **Email + password accounts** (NextAuth, no third-party OAuth required)
+- **Many linktrees per user** — one account, unlimited pages
+- **Analytics** — page views, clicks, CTR, top links & traffic sources (last 30 days)
+- **Custom appearance** — 6 themes plus custom accent color, background image, button shape & font
+- **Link power-ups** — thumbnails, scheduling (show/hide by date), featured links, drag-to-reorder
+- **Social icon row** and **media embeds** (YouTube / Spotify)
+- **Email lead capture** with CSV export
+- **Remove-branding** toggle and a **QR code** for every page
+- **Deploy free on Vercel** with a free Postgres database
+- Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Prisma 7
 
 ---
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/logo";
 import { getTheme } from "@/lib/themes";
 import {
   buttonRadius,
@@ -48,7 +49,7 @@ export type LinktreeViewProps = {
 
 function initials(title: string): string {
   const parts = title.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "🌿";
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "·";
 }
 
 export function LinktreeView({
@@ -233,9 +234,10 @@ export function LinktreeView({
           <footer className={`mt-auto pt-12 text-xs ${t.muted}`}>
             <Link
               href="/"
-              className="opacity-70 transition hover:opacity-100"
+              className="inline-flex items-center gap-1.5 opacity-70 transition hover:opacity-100"
             >
-              Made with 🌿 Linkertree
+              <LogoMark className="h-3.5 w-3.5" />
+              <span>Made with Linkertree</span>
             </Link>
           </footer>
         )}

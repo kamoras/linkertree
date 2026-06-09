@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { Logo } from "@/components/logo";
 
 export default async function Home() {
   const session = await auth();
@@ -13,9 +14,7 @@ export default async function Home() {
       </div>
 
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
-        <span className="text-lg font-semibold tracking-tight">
-          🌿 Linkertree
-        </span>
+        <Logo className="text-lg text-white" markClassName="h-6 w-6 text-indigo-400" />
         <div className="flex items-center gap-3 text-sm">
           {session ? (
             <Link
@@ -76,9 +75,18 @@ export default async function Home() {
 
         <div className="mt-20 grid w-full gap-4 sm:grid-cols-3">
           {[
-            { t: "Unlimited pages", d: "One account, many linktrees." },
-            { t: "Themes built in", d: "Six polished looks, no CSS needed." },
-            { t: "Own your data", d: "Self-host on your own database." },
+            {
+              t: "Built-in analytics",
+              d: "Views, clicks, CTR and top sources — no upsell.",
+            },
+            {
+              t: "Fully customizable",
+              d: "Themes, colors, fonts, thumbnails and embeds.",
+            },
+            {
+              t: "Own your data",
+              d: "Self-host on your own database, unlimited pages.",
+            },
           ].map((f) => (
             <div
               key={f.t}
