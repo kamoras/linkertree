@@ -1,0 +1,48 @@
+name: Deploy
+
+# Deploys to Vercel on every push to main — but only if the Vercel secrets are
+# configured. If you prefer Vercel's native Git integration (recommended, and
+# the simplest free option), you can leave these secrets unset and this workflow
+# will skip itself harmlessly.
+#
+# To enable Actions-driven deploys, add these repository secrets:
+#   VERCEL_TOKEN       — https://vercel.com/account/tokens
+#   VERCEL_ORG_ID      — from `vercel link` (.vercel/project.json)
+#   VERCEL_PROJECT_ID  — from `vercel link` (.vercel/project.json)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Vercel production deploy
+    runs-on: ubuntu-latest
+
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Deploy to Vercel
+        if: ${{ env.VERCEL_TOKEN != '' }}
+        run: |
+          npm install --global vercel@latest
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      - name: Skip notice
+        if: ${{ env.VERCEL_TOKEN == '' }}
+        run: |
+          echo "VERCEL_TOKEN secret not set — skipping Actions deploy."
+          echo "Vercel's native Git integration will handle deploys if connected."

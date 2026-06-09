@@ -1,0 +1,61 @@
+// Prisma schema for Linkertree.
+//
+// Local dev uses SQLite (zero config). For production on Vercel, switch the
+// datasource provider to "postgresql" and point DATABASE_URL at a free Postgres
+// (Neon, Supabase, or Vercel Postgres). See README for the one-line change.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pages Page[]
+}
+
+// A "page" is a single linktree. One user can own many pages.
+model Page {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  bio       String?
+  avatarUrl String?
+  theme     String   @default("midnight")
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  links Link[]
+
+  @@index([userId])
+}
+
+model Link {
+  id        String   @id @default(cuid())
+  title     String
+  url       String
+  position  Int      @default(0)
+  active    Boolean  @default(true)
+  clicks    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pageId String
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+}
