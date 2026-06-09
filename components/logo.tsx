@@ -24,7 +24,7 @@ export function LogoMark({ className }: { className?: string }) {
 // and the wordmark inherits the surrounding text color.
 export function Logo({
   className,
-  markClassName = "h-5 w-5 text-indigo-400",
+  markClassName = "h-5 w-5 text-[#43E660]",
 }: {
   className?: string;
   markClassName?: string;
