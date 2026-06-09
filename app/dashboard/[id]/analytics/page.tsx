@@ -104,7 +104,7 @@ export default async function AnalyticsPage({
           href={`/api/leads/${id}`}
           className="rounded-full border border-white/15 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
         >
-          ⬇ Export leads CSV
+          Export leads CSV
         </a>
       </header>
 

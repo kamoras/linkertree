@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { Logo } from "@/components/logo";
 import { RegisterForm } from "./register-form";
 
 export const metadata = { title: "Create your account" };
@@ -14,9 +15,10 @@ export default async function RegisterPage() {
       <div className="w-full max-w-sm">
         <Link
           href="/"
-          className="mb-8 block text-center text-lg font-semibold tracking-tight"
+          aria-label="Linkertree home"
+          className="mb-8 flex justify-center"
         >
-          🌿 Linkertree
+          <Logo className="text-lg text-white" />
         </Link>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
           <h1 className="text-xl font-semibold">Create your account</h1>

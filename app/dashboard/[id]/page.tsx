@@ -43,7 +43,7 @@ export default async function EditPage({
             href={`/dashboard/${page.id}/analytics`}
             className="rounded-full border border-white/15 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/5"
           >
-            📊 Analytics
+            Analytics
           </Link>
           <a
             href={`/${page.slug}`}

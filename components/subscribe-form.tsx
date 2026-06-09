@@ -27,7 +27,7 @@ export function SubscribeForm({
   if (state?.ok) {
     return (
       <p className={`text-center text-sm ${mutedClassName}`}>
-        Thanks for subscribing! 🎉
+        Thanks for subscribing.
       </p>
     );
   }
