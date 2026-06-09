@@ -57,3 +57,43 @@ export function normalizeHex(value: string | null | undefined): string | null {
   const v = value.trim();
   return HEX_RE.test(v) ? v.toLowerCase() : null;
 }
+
+// hex -> rgba() string (for derived muted/ring colors on custom themes).
+export function withAlpha(hex: string, alpha: number): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const int = parseInt(m[1], 16);
+  const r = (int >> 16) & 255;
+  const g = (int >> 8) & 255;
+  const b = int & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+export const CUSTOM_THEME_ID = "custom";
+
+export type CustomColors = {
+  customBg?: string | null;
+  customBg2?: string | null;
+  customText?: string | null;
+};
+
+// Sensible defaults so a half-configured custom theme still looks intentional.
+const DEFAULT_CUSTOM_BG = "#0f172a";
+const DEFAULT_CUSTOM_TEXT = "#ffffff";
+
+// Resolved background + text styling for the public page. For a custom theme we
+// emit inline styles (arbitrary hex can't be Tailwind classes); otherwise the
+// caller falls back to the preset theme's classes.
+export function resolveCustomTheme(c: CustomColors) {
+  const bg = normalizeHex(c.customBg) ?? DEFAULT_CUSTOM_BG;
+  const bg2 = normalizeHex(c.customBg2);
+  const text = normalizeHex(c.customText) ?? DEFAULT_CUSTOM_TEXT;
+  return {
+    backgroundStyle: {
+      background: bg2 ? `linear-gradient(to bottom, ${bg}, ${bg2})` : bg,
+    } as const,
+    textColor: text,
+    mutedColor: withAlpha(text, 0.7),
+    ringColor: withAlpha(text, 0.25),
+  };
+}

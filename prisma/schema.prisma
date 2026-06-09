@@ -40,6 +40,11 @@ model Page {
   fontFamily         String  @default("sans") // sans | serif | mono | rounded | display
   hideBranding       Boolean @default(false) // remove the "Made with Linkertree" footer
 
+  // --- Custom theme (used when theme == "custom") ---
+  customBg   String? // background color (hex); gradient start
+  customBg2  String? // optional gradient end color (hex)
+  customText String? // text color (hex)
+
   // --- Lead capture (Linktree Pro: collect emails) ---
   collectEmails Boolean @default(false)
   emailHeading  String?

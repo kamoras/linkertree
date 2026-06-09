@@ -10,6 +10,7 @@ type Props = {
   buttonStyle?: React.CSSProperties;
   inputClassName: string;
   mutedClassName: string;
+  mutedStyle?: React.CSSProperties;
 };
 
 // Email lead-capture block rendered on public pages when collectEmails is on.
@@ -20,13 +21,14 @@ export function SubscribeForm({
   buttonStyle,
   inputClassName,
   mutedClassName,
+  mutedStyle,
 }: Props) {
   const action = captureLead.bind(null, pageId);
   const [state, formAction] = useActionState(action, undefined);
 
   if (state?.ok) {
     return (
-      <p className={`text-center text-sm ${mutedClassName}`}>
+      <p className={`text-center text-sm ${mutedClassName}`} style={mutedStyle}>
         Thanks for subscribing.
       </p>
     );

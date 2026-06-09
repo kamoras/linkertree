@@ -85,6 +85,9 @@ export default async function EditPage({
                 hideBranding={page.hideBranding}
                 collectEmails={page.collectEmails}
                 emailHeading={page.emailHeading}
+                customBg={page.customBg}
+                customBg2={page.customBg2}
+                customText={page.customText}
                 links={page.links.filter((l) => l.active)}
                 socials={page.socialLinks}
               />

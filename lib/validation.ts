@@ -35,6 +35,14 @@ export const registerSchema = z.object({
 const optionalUrl = (max = 500) =>
   z.string().trim().url("Enter a valid URL").max(max).optional().or(z.literal(""));
 
+// Optional hex color (#rrggbb) that also accepts an empty string.
+const hexColor = z
+  .string()
+  .trim()
+  .regex(/^#[0-9a-fA-F]{6}$/, "Use a hex color like #ff0055")
+  .optional()
+  .or(z.literal(""));
+
 // datetime-local form value -> Date | null.
 const optionalDate = z
   .string()
@@ -51,12 +59,10 @@ export const pageSchema = z.object({
   theme: z.string().min(1).max(40),
   published: z.boolean().optional(),
   // Appearance overrides
-  accentColor: z
-    .string()
-    .trim()
-    .regex(/^#[0-9a-fA-F]{6}$/, "Use a hex color like #ff0055")
-    .optional()
-    .or(z.literal("")),
+  accentColor: hexColor,
+  customBg: hexColor,
+  customBg2: hexColor,
+  customText: hexColor,
   backgroundImageUrl: optionalUrl(800),
   buttonStyle: z.enum(["rounded", "pill", "square"]).optional(),
   fontFamily: z.enum(["sans", "serif", "mono", "rounded", "display"]).optional(),

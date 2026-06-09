@@ -70,6 +70,9 @@ export default async function PublicPage({
         hideBranding={page.hideBranding}
         collectEmails={page.collectEmails}
         emailHeading={page.emailHeading}
+        customBg={page.customBg}
+        customBg2={page.customBg2}
+        customText={page.customText}
         links={page.links}
         socials={page.socialLinks}
         trackClicks
