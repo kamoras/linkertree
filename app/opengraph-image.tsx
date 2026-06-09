@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Linkertree — everything you are, in one link, for free";
+export const alt = "Linkertree — everything you are, in one simple link";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -61,10 +61,10 @@ export default function OpengraphImage() {
                 maxWidth: 960,
               }}
             >
-              Everything you are. In one link. For free.
+              Everything you are. In one simple link.
             </div>
             <div style={{ fontSize: 30, color: "#3a5a48", marginTop: 26 }}>
-              Every Pro feature, zero dollars · Open source · Self-hostable
+              Your links, content and socials on one beautiful page.
             </div>
           </div>
         </div>

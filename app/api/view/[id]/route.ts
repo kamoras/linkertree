@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
-// Records a page view. Called as a fire-and-forget beacon from the public page
-// (client-side) so it isn't double-counted by static rendering or prefetches.
+// Records a page view, deduped per visitor (one row per pageId+visitId). Called
+// as a fire-and-forget beacon from the public page.
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -21,13 +22,25 @@ export async function POST(
     // no/invalid body — count as a direct view
   }
 
+  const visitId = (await cookies()).get("lt_vid")?.value ?? null;
+
   try {
     const page = await prisma.page.findUnique({
       where: { id },
       select: { id: true },
     });
     if (page) {
-      await prisma.pageView.create({ data: { pageId: id, referrer } });
+      // Dedupe per visitor: only record a view if this visit hasn't already
+      // been counted for this page. (No DB unique constraint — see schema.)
+      const already = visitId
+        ? await prisma.pageView.findFirst({
+            where: { pageId: id, visitId },
+            select: { id: true },
+          })
+        : null;
+      if (!already) {
+        await prisma.pageView.create({ data: { pageId: id, visitId, referrer } });
+      }
     }
   } catch {
     // ignore — analytics must never break the page

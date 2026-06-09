@@ -99,24 +99,34 @@ model SocialLink {
 
 // --- Analytics (Linktree Pro: detailed insights) ---
 
-// One row per public page visit.
+// One row per unique visitor per page. `visitId` is a cookie-backed id so a
+// refresh or return visit doesn't inflate the count, and so clicks can be
+// attributed to a visit for an honest click-through rate.
 model PageView {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   referrer  String?
+  visitId   String?
 
   pageId String
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
+  // No DB unique constraint on (pageId, visitId): adding one to an already
+  // populated table makes `prisma db push` demand --accept-data-loss, which
+  // would mask genuinely destructive changes on every future deploy. Views are
+  // deduped per visitor in the API route instead (best-effort is fine here).
   @@index([pageId])
   @@index([pageId, createdAt])
+  @@index([pageId, visitId])
 }
 
 // One row per link click (in addition to the denormalized Link.clicks counter).
+// `visitId` links the click back to the visit that made it.
 model ClickEvent {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   referrer  String?
+  visitId   String?
   pageId    String // denormalized for page-level aggregation
 
   linkId String
@@ -124,6 +134,7 @@ model ClickEvent {
 
   @@index([linkId])
   @@index([pageId, createdAt])
+  @@index([pageId, visitId])
 }
 
 // An email captured from a public page's subscribe form.

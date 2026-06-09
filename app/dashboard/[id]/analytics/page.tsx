@@ -47,8 +47,9 @@ export default async function AnalyticsPage({
   const since = new Date();
   since.setDate(since.getDate() - WINDOW_DAYS);
 
-  const [totalViews, clickSum, views, clicks, topLinks, leadCount] =
+  const [totalViews, clickSum, views, clicks, topLinks, leadCount, clickedVisits] =
     await Promise.all([
+      // Each PageView row is one unique visitor (deduped per visitId).
       prisma.pageView.count({ where: { pageId: id } }),
       prisma.link.aggregate({ where: { pageId: id }, _sum: { clicks: true } }),
       prisma.pageView.findMany({
@@ -66,10 +67,21 @@ export default async function AnalyticsPage({
         select: { id: true, title: true, clicks: true },
       }),
       prisma.lead.count({ where: { pageId: id } }),
+      // Distinct visits that clicked at least one link.
+      prisma.clickEvent.findMany({
+        where: { pageId: id, visitId: { not: null } },
+        distinct: ["visitId"],
+        select: { visitId: true },
+      }),
     ]);
 
   const totalClicks = clickSum._sum.clicks ?? 0;
-  const ctr = totalViews > 0 ? Math.round((totalClicks / totalViews) * 100) : 0;
+  // CTR = share of visitors who clicked at least one link (so it stays 0–100%),
+  // not raw clicks ÷ views (which could exceed 100% when people click several).
+  const ctr =
+    totalViews > 0
+      ? Math.min(100, Math.round((clickedVisits.length / totalViews) * 100))
+      : 0;
 
   // Daily buckets for the charts.
   const days = lastNDays(WINDOW_DAYS);
@@ -113,9 +125,13 @@ export default async function AnalyticsPage({
 
       {/* Stat cards */}
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat label="Total views" value={totalViews} />
-        <Stat label="Total clicks" value={totalClicks} />
-        <Stat label="Click-through rate" value={`${ctr}%`} />
+        <Stat label="Visitors" value={totalViews} hint="unique people" />
+        <Stat label="Link clicks" value={totalClicks} hint="across all links" />
+        <Stat
+          label="Click-through rate"
+          value={`${ctr}%`}
+          hint="of visitors clicked"
+        />
         <Stat label="Email leads" value={leadCount} />
       </div>
 
@@ -169,11 +185,20 @@ export default async function AnalyticsPage({
   );
 }
 
-function Stat({ label, value }: { label: string; value: number | string }) {
+function Stat({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: number | string;
+  hint?: string;
+}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
       <p className="text-2xl font-bold text-white">{value}</p>
       <p className="mt-1 text-xs text-slate-400">{label}</p>
+      {hint && <p className="mt-0.5 text-[11px] text-slate-500">{hint}</p>}
     </div>
   );
 }
