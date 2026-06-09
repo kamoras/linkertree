@@ -4,8 +4,13 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import type { Page } from "@prisma/client";
 import { themes } from "@/lib/themes";
+import { BUTTON_STYLES, FONT_OPTIONS } from "@/lib/appearance";
 import { updatePage } from "@/app/actions/pages";
 import { DeletePageButton } from "./delete-page-button";
+
+const selectClass =
+  "w-full rounded-lg border border-white/10 bg-slate-900/60 px-3 py-2.5 text-sm text-white outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30";
+const checkboxClass = "h-4 w-4 rounded border-white/20 bg-slate-900";
 
 export function PageSettings({ page }: { page: Page }) {
   const action = updatePage.bind(null, page.id);
@@ -89,12 +94,117 @@ export function PageSettings({ page }: { page: Page }) {
             type="checkbox"
             name="published"
             defaultChecked={page.published}
-            className="h-4 w-4 rounded border-white/20 bg-slate-900"
+            className={checkboxClass}
           />
           <span className="text-sm text-slate-300">
             Published (visible to the public)
           </span>
         </label>
+
+        {/* Appearance & branding */}
+        <details className="rounded-lg border border-white/10 bg-slate-900/40 p-4">
+          <summary className="cursor-pointer select-none text-sm font-medium text-slate-200">
+            🎨 Appearance & branding
+          </summary>
+          <div className="mt-4 space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-slate-300">
+                  Button shape
+                </span>
+                <select
+                  name="buttonStyle"
+                  defaultValue={page.buttonStyle}
+                  className={selectClass}
+                >
+                  {BUTTON_STYLES.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1.5 block text-sm font-medium text-slate-300">
+                  Font
+                </span>
+                <select
+                  name="fontFamily"
+                  defaultValue={page.fontFamily}
+                  className={selectClass}
+                >
+                  {FONT_OPTIONS.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                name="accentEnabled"
+                defaultChecked={Boolean(page.accentColor)}
+                className={checkboxClass}
+              />
+              <span className="text-sm text-slate-300">Custom accent color</span>
+              <input
+                type="color"
+                name="accentColor"
+                defaultValue={page.accentColor ?? "#6366f1"}
+                className="h-8 w-12 cursor-pointer rounded border border-white/10 bg-transparent"
+              />
+            </div>
+
+            <Field
+              label="Background image URL (optional)"
+              name="backgroundImageUrl"
+              type="url"
+              defaultValue={page.backgroundImageUrl ?? ""}
+              placeholder="https://…/background.jpg"
+            />
+
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                name="hideBranding"
+                defaultChecked={page.hideBranding}
+                className={checkboxClass}
+              />
+              <span className="text-sm text-slate-300">
+                Hide “Made with Linkertree” footer
+              </span>
+            </label>
+          </div>
+        </details>
+
+        {/* Email capture */}
+        <details className="rounded-lg border border-white/10 bg-slate-900/40 p-4">
+          <summary className="cursor-pointer select-none text-sm font-medium text-slate-200">
+            ✉️ Collect emails
+          </summary>
+          <div className="mt-4 space-y-4">
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                name="collectEmails"
+                defaultChecked={page.collectEmails}
+                className={checkboxClass}
+              />
+              <span className="text-sm text-slate-300">
+                Show an email signup form on my page
+              </span>
+            </label>
+            <Field
+              label="Signup heading (optional)"
+              name="emailHeading"
+              defaultValue={page.emailHeading ?? ""}
+              placeholder="Join my newsletter"
+            />
+          </div>
+        </details>
 
         {state?.error && (
           <p className="text-sm text-rose-400">{state.error}</p>

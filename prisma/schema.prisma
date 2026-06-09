@@ -25,36 +25,116 @@ model User {
 
 // A "page" is a single linktree. One user can own many pages.
 model Page {
-  id        String   @id @default(cuid())
-  slug      String   @unique
+  id        String  @id @default(cuid())
+  slug      String  @unique
   title     String
   bio       String?
   avatarUrl String?
-  theme     String   @default("midnight")
-  published Boolean  @default(true)
+  theme     String  @default("midnight")
+  published Boolean @default(true)
+
+  // --- Appearance overrides (Linktree Pro: custom branding) ---
+  accentColor        String? // hex; overrides theme button/accent color
+  backgroundImageUrl String? // full-bleed background image behind the card
+  buttonStyle        String  @default("rounded") // rounded | pill | square | outline
+  fontFamily         String  @default("sans") // sans | serif | mono | rounded | display
+  hideBranding       Boolean @default(false) // remove the "Made with Linkertree" footer
+
+  // --- Lead capture (Linktree Pro: collect emails) ---
+  collectEmails Boolean @default(false)
+  emailHeading  String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  links Link[]
+  links       Link[]
+  socialLinks SocialLink[]
+  views       PageView[]
+  leads       Lead[]
 
   @@index([userId])
 }
 
 model Link {
-  id        String   @id @default(cuid())
-  title     String
-  url       String
-  position  Int      @default(0)
-  active    Boolean  @default(true)
-  clicks    Int      @default(0)
+  id       String  @id @default(cuid())
+  title    String
+  url      String
+  position Int     @default(0)
+  active   Boolean @default(true)
+  clicks   Int     @default(0)
+
+  // --- Link power-ups (Linktree Pro) ---
+  thumbnailUrl String? // per-link image/icon
+  featured     Boolean   @default(false) // highlighted, larger styling
+  embedType    String? // null = button; "youtube" | "spotify" render an embed
+  startsAt     DateTime? // scheduled visibility window (inclusive)
+  endsAt       DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   pageId String
   page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
+  clickEvents ClickEvent[]
+
+  @@index([pageId])
+}
+
+// A row of social-network icons rendered at the top of a public page.
+model SocialLink {
+  id       String @id @default(cuid())
+  platform String // instagram | x | tiktok | youtube | github | linkedin | facebook | email | website ...
+  url      String
+  position Int    @default(0)
+
+  pageId String
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+}
+
+// --- Analytics (Linktree Pro: detailed insights) ---
+
+// One row per public page visit.
+model PageView {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  referrer  String?
+
+  pageId String
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@index([pageId, createdAt])
+}
+
+// One row per link click (in addition to the denormalized Link.clicks counter).
+model ClickEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  referrer  String?
+  pageId    String // denormalized for page-level aggregation
+
+  linkId String
+  link   Link   @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId])
+  @@index([pageId, createdAt])
+}
+
+// An email captured from a public page's subscribe form.
+model Lead {
+  id        String   @id @default(cuid())
+  email     String
+  createdAt DateTime @default(now())
+
+  pageId String
+  page   Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, email])
   @@index([pageId])
 }
