@@ -7,12 +7,10 @@ const globalForPrisma = globalThis as unknown as {
 
 // Prisma 7 connects through a driver adapter rather than a datasource URL in
 // the schema. We use the node-postgres adapter pointed at DATABASE_URL.
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    adapter,
+    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 

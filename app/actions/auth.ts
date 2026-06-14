@@ -6,7 +6,6 @@ import { registerSchema, slugSchema } from "@/lib/validation";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-// Turn an email/name into a candidate handle, then ensure it's unique.
 async function uniqueSlugFromSeed(seed: string): Promise<string> {
   let base = seed
     .toLowerCase()
@@ -18,7 +17,6 @@ async function uniqueSlugFromSeed(seed: string): Promise<string> {
 
   let candidate = base;
   let n = 1;
-  // Loop until we find an unused slug.
   while (
     !slugSchema.safeParse(candidate).success ||
     (await prisma.page.findUnique({ where: { slug: candidate } }))
@@ -26,6 +24,7 @@ async function uniqueSlugFromSeed(seed: string): Promise<string> {
     candidate = `${base}-${n}`.slice(0, 32);
     n += 1;
     if (n > 10000) {
+      // Timestamp fallback prevents an infinite loop under extreme contention.
       candidate = `user-${Date.now().toString(36)}`;
       break;
     }
@@ -52,11 +51,8 @@ export async function registerUser(formData: FormData): Promise<ActionResult> {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const slug = await uniqueSlugFromSeed(
-    (name && name.length ? name : email.split("@")[0]) || "user"
-  );
+  const slug = await uniqueSlugFromSeed(name || email.split("@")[0] || "user");
 
-  // Create the user with a first linktree ready to go.
   await prisma.user.create({
     data: {
       email,

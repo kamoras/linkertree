@@ -22,13 +22,20 @@ async function assertPageOwner(pageId: string, userId: string) {
 
 export type ActionState = { error?: string } | undefined;
 
+async function uniquePageSlug(): Promise<string> {
+  let slug: string;
+  do {
+    slug = `links-${Math.random().toString(36).slice(2, 7)}`;
+  } while (await prisma.page.findUnique({ where: { slug }, select: { id: true } }));
+  return slug;
+}
+
 export async function createPage(): Promise<void> {
   const userId = await requireUserId();
-  const suffix = Math.random().toString(36).slice(2, 7);
   const page = await prisma.page.create({
     data: {
       userId,
-      slug: `links-${suffix}`,
+      slug: await uniquePageSlug(),
       title: "New Linktree",
       theme: "midnight",
     },
@@ -150,7 +157,7 @@ export async function addLink(
 export async function updateLink(
   linkId: string,
   formData: FormData
-): Promise<void> {
+): Promise<ActionState> {
   const userId = await requireUserId();
   const link = await prisma.link.findUnique({ where: { id: linkId } });
   if (!link) redirect("/dashboard");
@@ -165,7 +172,9 @@ export async function updateLink(
     startsAt: formData.get("startsAt") ?? "",
     endsAt: formData.get("endsAt") ?? "",
   });
-  if (!parsed.success) return;
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
 
   await prisma.link.update({
     where: { id: linkId },
@@ -203,7 +212,6 @@ export async function deleteLink(linkId: string): Promise<void> {
   revalidatePath(`/dashboard/${link.pageId}`);
 }
 
-// Move a link up or down by swapping positions with its neighbour.
 export async function moveLink(
   linkId: string,
   direction: "up" | "down"
@@ -235,7 +243,6 @@ export async function moveLink(
   revalidatePath(`/dashboard/${link.pageId}`);
 }
 
-// Persist a new ordering produced by drag-and-drop in the editor.
 export async function reorderLinks(
   pageId: string,
   orderedIds: string[]

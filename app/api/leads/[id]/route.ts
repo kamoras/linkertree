@@ -26,9 +26,13 @@ export async function GET(
     select: { email: true, createdAt: true },
   });
 
+  function csvCell(value: string): string {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+
   const rows = [
     "email,subscribed_at",
-    ...leads.map((l) => `${l.email},${l.createdAt.toISOString()}`),
+    ...leads.map((l) => `${csvCell(l.email)},${csvCell(l.createdAt.toISOString())}`),
   ];
 
   return new Response(rows.join("\n"), {

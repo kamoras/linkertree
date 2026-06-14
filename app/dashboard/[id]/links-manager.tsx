@@ -64,13 +64,7 @@ export function LinksManager({
 
   function handleDrop() {
     dragId.current = null;
-    setItems((curr) => {
-      reorderLinks(
-        pageId,
-        curr.map((i) => i.id)
-      );
-      return curr;
-    });
+    reorderLinks(pageId, items.map((i) => i.id));
   }
 
   return (
@@ -154,14 +148,19 @@ function LinkRow({
   onDrop: () => void;
 }) {
   const [editing, setEditing] = useState(false);
+  const [editError, setEditError] = useState<string | undefined>();
 
   if (editing) {
     return (
       <li className="rounded-lg border border-white/10 bg-slate-900/40 p-3">
         <form
           action={async (formData) => {
-            await updateLink(link.id, formData);
-            setEditing(false);
+            const result = await updateLink(link.id, formData);
+            if (result?.error) {
+              setEditError(result.error);
+            } else {
+              setEditing(false);
+            }
           }}
           className="space-y-2"
         >
@@ -240,13 +239,14 @@ function LinkRow({
             </label>
           </div>
 
+          {editError && <p className="text-sm text-rose-400">{editError}</p>}
           <div className="flex gap-2">
             <button className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-slate-900 hover:bg-slate-200">
               Save
             </button>
             <button
               type="button"
-              onClick={() => setEditing(false)}
+              onClick={() => { setEditing(false); setEditError(undefined); }}
               className="rounded-lg border border-white/15 px-3 py-2 text-sm text-slate-300 hover:bg-white/5"
             >
               Cancel
