@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -6,7 +7,9 @@ import { LinktreeView } from "@/components/linktree-view";
 // Revalidate public pages periodically so edits show up without a redeploy.
 export const revalidate = 60;
 
-async function getPage(slug: string) {
+// cache() deduplicates the DB call when generateMetadata and the page
+// component both run in the same request.
+const getPage = cache(async (slug: string) => {
   const now = new Date();
   return prisma.page.findUnique({
     where: { slug: slug.toLowerCase() },
@@ -25,7 +28,7 @@ async function getPage(slug: string) {
       },
     },
   });
-}
+});
 
 export async function generateMetadata({
   params,

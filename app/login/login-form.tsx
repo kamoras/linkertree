@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { FormField } from "@/components/form-field";
 
 export function LoginForm() {
   const router = useRouter();
@@ -32,8 +33,8 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="mt-6 space-y-4">
-      <Field label="Email" name="email" type="email" autoComplete="email" />
-      <Field
+      <FormField label="Email" name="email" type="email" autoComplete="email" />
+      <FormField
         label="Password"
         name="password"
         type="password"
@@ -48,23 +49,5 @@ export function LoginForm() {
         {loading ? "Logging in…" : "Log in"}
       </button>
     </form>
-  );
-}
-
-function Field({
-  label,
-  ...props
-}: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-slate-300">
-        {label}
-      </span>
-      <input
-        required
-        {...props}
-        className="w-full rounded-lg border border-white/10 bg-slate-900/60 px-3 py-2.5 text-sm text-white outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30"
-      />
-    </label>
   );
 }

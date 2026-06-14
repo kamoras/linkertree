@@ -4,34 +4,33 @@ import { Logo } from "@/components/logo";
 
 // Brand palette — a warm spring-green / cream identity.
 const INK = "#0F2E1B"; // near-black green (headlines)
-const LEAF = "#1F7A3D"; // mid green (mark / accents on cream)
 const LIME = "#43E660"; // vivid highlight green
 const BTN = "#1B5E2B"; // primary button green
 
 const FEATURES = [
   {
-    t: "Built-in analytics",
-    d: "See your visitors, your clicks, and where your traffic comes from.",
+    title: "Built-in analytics",
+    description: "See your visitors, your clicks, and where your traffic comes from.",
   },
   {
-    t: "Unlimited links & pages",
-    d: "Add as many links and as many pages as you need.",
+    title: "Unlimited links & pages",
+    description: "Add as many links and as many pages as you need.",
   },
   {
-    t: "Custom themes & colors",
-    d: "Make it yours with themes, colors, fonts and backgrounds.",
+    title: "Custom themes & colors",
+    description: "Make it yours with themes, colors, fonts and backgrounds.",
   },
   {
-    t: "Scheduled & featured links",
-    d: "Spotlight what matters and schedule links to come and go.",
+    title: "Scheduled & featured links",
+    description: "Spotlight what matters and schedule links to come and go.",
   },
   {
-    t: "YouTube & Spotify embeds",
-    d: "Drop in a video or a track and it plays right on your page.",
+    title: "YouTube & Spotify embeds",
+    description: "Drop in a video or a track and it plays right on your page.",
   },
   {
-    t: "Email capture",
-    d: "Grow a mailing list from your page and export it anytime.",
+    title: "Email capture",
+    description: "Grow a mailing list from your page and export it anytime.",
   },
 ];
 
@@ -132,15 +131,15 @@ export default async function Home() {
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <div
-              key={f.t}
+              key={f.title}
               className="rounded-2xl border bg-white p-6 text-left shadow-sm"
               style={{ borderColor: "rgba(15,46,27,0.08)" }}
             >
               <div className="flex items-center gap-2">
                 <Check />
-                <p className="font-bold">{f.t}</p>
+                <p className="font-bold">{f.title}</p>
               </div>
-              <p className="mt-2 text-sm text-[#3a5a48]">{f.d}</p>
+              <p className="mt-2 text-sm text-[#3a5a48]">{f.description}</p>
             </div>
           ))}
         </div>

@@ -87,18 +87,24 @@ export default async function AnalyticsPage({
   const days = lastNDays(WINDOW_DAYS);
   const viewByDay = new Map<string, number>();
   const clickByDay = new Map<string, number>();
-  for (const v of views)
-    viewByDay.set(dayKey(v.createdAt), (viewByDay.get(dayKey(v.createdAt)) ?? 0) + 1);
-  for (const c of clicks)
-    clickByDay.set(dayKey(c.createdAt), (clickByDay.get(dayKey(c.createdAt)) ?? 0) + 1);
+  for (const v of views) {
+    const key = dayKey(v.createdAt);
+    viewByDay.set(key, (viewByDay.get(key) ?? 0) + 1);
+  }
+  for (const c of clicks) {
+    const key = dayKey(c.createdAt);
+    clickByDay.set(key, (clickByDay.get(key) ?? 0) + 1);
+  }
 
   const viewSeries = days.map((d) => viewByDay.get(dayKey(d)) ?? 0);
   const clickSeries = days.map((d) => clickByDay.get(dayKey(d)) ?? 0);
 
   // Top referrers across views + clicks.
   const refCounts = new Map<string, number>();
-  for (const v of views)
-    refCounts.set(refHost(v.referrer), (refCounts.get(refHost(v.referrer)) ?? 0) + 1);
+  for (const v of views) {
+    const host = refHost(v.referrer);
+    refCounts.set(host, (refCounts.get(host) ?? 0) + 1);
+  }
   const topRefs = [...refCounts.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6);
